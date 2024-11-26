@@ -1,0 +1,20 @@
+# Use an official Node.js image as the base image
+FROM node:18
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json to the container
+COPY package*.json ./
+
+# Install dependencies (including dev dependencies for testing)
+RUN npm install
+
+# Copy the rest of the application code to the container
+COPY . .
+
+# Install testing dependencies (if necessary)
+RUN npm install --only=dev
+
+# Run the tests (you can replace this with your specific test command)
+CMD ["npm", "run", "test"]

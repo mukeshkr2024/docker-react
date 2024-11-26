@@ -244,6 +244,10 @@
 
 ---
 
+Here’s a completed version of the document:
+
+---
+
 ### **Other Useful Commands**
 
 1. **Update Docker Engine**
@@ -269,11 +273,13 @@
    ```
    - Displays system-wide information about Docker, including the number of containers, images, storage drivers, and more.
 
-## Building custom images with Docker
+---
 
--- docker file
+## **Building Custom Images with Docker**
 
-```
+### Dockerfile Example
+
+```dockerfile
 # Use the official Alpine image as the base image
 FROM alpine:latest
 
@@ -282,17 +288,90 @@ RUN apk add --no-cache redis
 
 # Set the default command to run Redis server
 CMD ["redis-server"]
-
 ```
 
-- `docker build -t image-name .`
-- `docker run image-name`
+1. **Build the Image**
 
-### Rebult with cache
+   ```bash
+   docker build -t image-name .
+   ```
 
-### Tagging a image
+   - Builds a Docker image from the `Dockerfile` in the current directory and tags it as `image-name`.
 
-## Docker compose
+2. **Run the Container**
+   ```bash
+   docker run image-name
+   ```
+   - Runs a container using the created `image-name`.
 
-1. docker-compose up
-2. docker-compose up --build
+---
+
+### **Rebuilding with Cache**
+
+To rebuild a Docker image without using the cache:
+
+```bash
+docker build --no-cache -t image-name .
+```
+
+- Forces Docker to ignore the cache and rebuild every layer from scratch.
+
+---
+
+### **Tagging an Image**
+
+To add a specific tag to your image:
+
+```bash
+docker tag image-name your-repo/image-name:tag
+```
+
+- Tags your image with a specific name and version (e.g., `latest`, `v1.0`).
+
+Push the tagged image to a registry:
+
+```bash
+docker push your-repo/image-name:tag
+```
+
+---
+
+## **Docker Compose**
+
+1. **Start Services**
+
+   ```bash
+   docker-compose up
+   ```
+
+   - Starts services defined in the `docker-compose.yml` file.
+
+2. **Rebuild and Start Services**
+
+   ```bash
+   docker-compose up --build
+   ```
+
+   - Rebuilds images before starting services.
+
+3. **Stop Services**
+   ```bash
+   docker-compose down
+   ```
+   - Stops and removes containers, networks, and volumes created by `docker-compose up`.
+
+---
+
+### **Automatic Restart of Containers**
+
+To ensure a container restarts automatically after failure or reboot, use the `--restart` flag:
+
+```bash
+docker run --restart unless-stopped image-name
+```
+
+- **Restart Policies**:
+  - `no`: Do not restart the container (default).
+  - `always`: Always restart the container.
+  - `unless-stopped`: Restart unless the container is stopped manually.
+  - `on-failure`: Restart the container only if it exits with a non-zero status.
