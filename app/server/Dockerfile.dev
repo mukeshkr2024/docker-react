@@ -1,0 +1,21 @@
+# Base image for Node.js
+FROM node:18-alpine as base
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN npm install
+
+# Copy application files
+COPY . .
+
+# Install development tools (e.g., nodemon for live reloading)
+RUN npm install --save-dev nodemon
+
+# Expose the application port
+EXPOSE 5000
+
+# Use nodemon for live reloading in development
+CMD ["npx", "nodemon", "--watch", ".", "index.js"]
