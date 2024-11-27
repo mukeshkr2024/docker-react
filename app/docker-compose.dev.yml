@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+  nginx:
+    restart: always
+    build:
+      context: ./nginx # Assuming your NGINX-related files are in the ./nginx folder
+      dockerfile: Dockerfile.dev # The custom NGINX Dockerfile
+    ports:
+      - "3050:80" # Expose NGINX on port 3050
+    depends_on:
+      - frontend
+      - app
+    networks:
+      - app-network
+
+  app:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev # The backend Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - PG_USER=postgres
+      - PG_HOST=postgres
+      - PG_DATABASE=postgres
+      - PG_PASSWORD=password
+      - PG_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./server:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev # The frontend Dockerfile
+    ports:
+      - "5173:5173" # Port for the frontend
+    environment:
+      - VITE_API_URL=http://nginx/api # Use NGINX as the API gateway
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - app
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,5 +1,5 @@
-# Use an official Node.js image as the base image
-FROM node:18
+# Step 1: Build the React app
+FROM node:18 as build
 
 # Set the working directory in the container
 WORKDIR /app
@@ -13,8 +13,17 @@ RUN npm install
 # Copy the rest of the application code to the container
 COPY . .
 
-# Expose the port that Vite uses
-EXPOSE 5173
+# Build the application (creates the dist/ directory with the static files)
+RUN npm run build
 
-# Start Vite in development mode
-CMD ["npm", "run", "dev", "--", "--host"]
+# Step 2: Serve the app with NGINX
+FROM nginx:alpine
+
+# Copy the build files from the previous step to the NGINX directory
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Expose port 80 to be accessible from outside the container
+EXPOSE 80
+
+# Use the default NGINX configuration (you can customize it if needed)
+CMD ["nginx", "-g", "daemon off;"]

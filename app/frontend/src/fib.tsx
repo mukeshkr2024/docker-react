@@ -14,10 +14,16 @@ const Fib: React.FC = () => {
     const [values, setValues] = useState<Values>({});
     const [index, setIndex] = useState<string>("");
 
+    // Fetch the API URL from the environment variable (VITE_API_URL)
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+    console.log(apiUrl);
+
+
     // Fetch current values from Redis
     const fetchValues = async (): Promise<void> => {
         try {
-            const response = await axios.get<Values>("/values/current");
+            const response = await axios.get<Values>(`${apiUrl}/values/current`);
             setValues(response.data);
         } catch (err) {
             console.error("Error fetching values:", (err as Error).message);
@@ -27,7 +33,7 @@ const Fib: React.FC = () => {
     // Fetch all indexes from PostgreSQL
     const fetchIndexes = async (): Promise<void> => {
         try {
-            const response = await axios.get<SeenIndex[]>("/values/all");
+            const response = await axios.get<SeenIndex[]>(`${apiUrl}/values/all`);
             setSeenIndexes(response.data);
         } catch (err) {
             console.error("Error fetching indexes:", (err as Error).message);
@@ -44,7 +50,7 @@ const Fib: React.FC = () => {
         }
 
         try {
-            await axios.post("/values", { index });
+            await axios.post(`${apiUrl}/values`, { index });
             setIndex(""); // Clear the input field
             fetchValues(); // Refresh values
             fetchIndexes(); // Refresh seen indexes
